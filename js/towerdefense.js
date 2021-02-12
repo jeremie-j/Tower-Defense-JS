@@ -414,7 +414,10 @@ function Up(what){
 }}
 function Title(){
   BuyTitle.innerHTML = "Vague: "+ Wave+ " | Vie: "+ vie + " | Argent: "+Argent;
-  if(Ennemis.length > 0){
+  if(Ennemis.length > 0 && Ennemis.length*2>50){
+    UpButtons[4].value = "Passer a la vague suivante (Bonus : 50$)";
+    BuyButtons[4].value = "Passer a la vague suivante (Bonus : 50$)";
+  }else if(Ennemis.length > 0){
     UpButtons[4].value = "Passer a la vague suivante (Bonus : "+Ennemis.length*2+"$)";
     BuyButtons[4].value = "Passer a la vague suivante (Bonus : "+Ennemis.length*2+"$)";
   }else{
