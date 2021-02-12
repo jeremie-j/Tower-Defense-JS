@@ -1,20 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Tower Defense de fou</title>
     <link rel="stylesheet" href="./css/style.css">
+    <link rel="icon" type="image/png" href="../img/logo.png" />
     <meta property="og:title" content="Le Tower Défense de fou" />
     <meta property="og:type" content="website">
-    <meta property="og:description" content="Le Tower Defense le plus apprecié des 5 dernière génération ! (*Etude réalisé sur un echantillon de la population Française, incluant en tout : moi)">
+    <meta property="og:description"
+        content="Le Tower Defense le plus apprecié des 5 dernière génération ! (*Etude réalisé sur un echantillon de la population Française, incluant en tout : moi)">
     <meta property="og:site_name" content="Clique">
     <meta property="og:image" content="https://le-td-fou.netlify.app/media/exemplemap.png">
     <meta property="og:url" content="https://le-td-fou.netlify.app/">
     <meta property="og:image:width" content="767">
     <meta property="og:image:height" content="767">
 </head>
+
 <body>
     <div id="img-loading" style="display: none;">
         <img id="map1" src="media/map1.png">
@@ -34,68 +38,79 @@
 
     <section id="menu">
         <div id="MenuContent">
-        <h1>Choisissez une carte :</h1>
-        <div id="cartes">
-            <div onclick="play(1)">
-                <img src="./media/map1.png" alt="Carte1" class="imgCarte" id="carte1">
-                <h2>Jungle</h2>
+            <h1>Choisissez une carte :</h1>
+            <div id="cartes">
+                <div onclick="play(1)">
+                    <img src="./media/map1.png" alt="Carte1" class="imgCarte" id="carte1">
+                    <h2>Jungle</h2>
+                </div>
+                <div onclick="play(2)">
+                    <img src="./media/map2.png" alt="Carte2" class="imgCarte" id="carte2">
+                    <h2>Olympus</h2>
+                </div>
+                <div onclick="play(3)">
+                    <img src="./media/map3.png" alt="Carte3" class="imgCarte" id="carte3">
+                    <h2>Kings Canyon</h2>
+                </div>
+                <div onclick="play(4)">
+                    <img src="./media/map4.png" alt="Carte4" class="imgCarte" id="carte4">
+                    <h2>Plage</h2>
+                </div>
+                <input id="helpbutton" type="button" value="Comment jouer ?" onclick="aide()">
             </div>
-            <div onclick="play(2)">
-                <img src="./media/map2.png" alt="Carte2" class="imgCarte" id="carte2">
-                <h2>Olympus</h2>
-            </div>
-            <div onclick="play(3)">
-                <img src="./media/map3.png" alt="Carte3" class="imgCarte" id="carte3">
-                <h2>Kings Canyon</h2>
-            </div>
-            <div onclick="play(4)">
-                <img src="./media/map4.png" alt="Carte4" class="imgCarte" id="carte4">
-                <h2>Plage</h2>
-            </div>
-            <input id="helpbutton" type="button" value="Comment jouer ?" onclick="aide()">
         </div>
-    </div>
     </section>
     <section id="jeu">
-    <canvas width="1100" height="800"></canvas>
-    <div id="Boutons_Jeu">
-        <div id="Buy">
-            <h1></h1>
-            <input type="button" value ="Acheter un Canon (300$)" onclick="Buy('Canon')" class="Canon">
-            <input type="button" value ="Acheter un Sniper (500$)" onclick="Buy('Sniper')" class="Sniper">
-            <input type="button" value ="Acheter un Four (400$)" onclick="Buy('Four')" class="Four">
-            <input type="button" value ="Annuler l'achat" onclick="Buy('Annuler')">
-            <input type="button" value ="Appeller prochaine vague" onclick="CreateWave()">
+        <canvas width="1100" height="800"></canvas>
+        <div id="Boutons_Jeu">
+            <div id="Buy">
+                <h1></h1>
+                <input type="button" value="Acheter un Canon (300$)" onclick="Buy('Canon')" class="Canon">
+                <input type="button" value="Acheter un Sniper (500$)" onclick="Buy('Sniper')" class="Sniper">
+                <input type="button" value="Acheter un Four (400$)" onclick="Buy('Four')" class="Four">
+                <input type="button" value="Annuler l'achat" onclick="Buy('Annuler')">
+                <input type="button" value="Appeller prochaine vague" onclick="CreateWave()">
+            </div>
+            <div id="Upgrades">
+                <h1></h1>
+                <input type="button" value="Ameliorer la portée (+50 | 400$)" onclick="Up('range')">
+                <input type="button" value="Ameliorer les dégats (+2 | 500$)"
+                    onclick="Up('damage')">
+                <input type="button" value="Ameliorer la vitesse d'attaque (-0,1s | 250$)" onclick="Up('speed')">
+                <input type="button" value="Annuler" onclick="Unselect()">
+                <input type="button" value="Appeller prochaine vague" onclick="CreateWave()">
+            </div>
+            <div id="Resultats">
+                <h1></h1>
+                <input type="button" value="Retourner au Menu" onclick="RetourMenu()">
+            </div>
         </div>
-        <div id="Upgrades">
-            <h1></h1>
-            <input type="button" value ="Ameliorer la portée (+50 | 400$)" onclick="Up('range')" >
-            <input type="button" value ="Ameliorer les dégats (+2 | 500$)" onclick="Up('damage')" >
-            <input type="button" value ="Ameliorer la vitesse d'attaque (-0,1s | 250$)" onclick="Up('speed')" >
-            <input type="button" value ="Annuler" onclick="Unselect()">
-            <input type="button" value ="Appeller prochaine vague" onclick="CreateWave()">
+    </section>
+    <section id="aide">
+        <h1>Comment jouer ?</h1>
+        <div id="Text">
+            <p>Ce jeu est un tower defense, le but est construire des tours défensives, et arrêter des vagues d'ennemis
+                en les eliminants.</p>
+            <p>Dans ce jeu, vous avez accès à 3 types de tours, les canons, qui sont de bon compromis entre la portée,
+                l'attaque, et la vitesse d'attaque. Il y a ensuite les snipers, avec une portée couvrant toute la carte,
+                des dégâts considérables, mais une vitesse d'attaque très lente. Et enfin, les Fours, émettant de la
+                chaleur a courte portée, mais en infligeant des dégâts de zone.</p>
+            <p>Les vagues sont à appeler manuellement afin de laisser le temps de rajouter ou améliorer des tours, si
+                toutefois, le jeu ne va pas assez vite, vous pouvez appeler une vague d'ennemis avant même que la
+                précédente soit terminer, en bénéficiant d'un bonus d'argent.</p>
+            <p>Les ennemis sont de couleurs rouge a noir selon leur niveau, ce qui influe sur les dégâts de ces
+                derniers.</p>
+            <p>Vous pouvez améliorer vos tours afin de leur donner de l'attaque, de la portée ou de la vitesse d'attaque
+                supplémentaire.</p>
         </div>
-        <div id="Resultats">
-            <h1></h1>
-            <input type="button" value ="Retourner au Menu" onclick="RetourMenu()">
+        <div id="TowerCards">
+            <img src="./media/CanonCard.png" alt="CanonCard">
+            <img src="./media/SniperCard.png" alt="SnipersCard">
+            <img src="./media/FourCard.png" alt="FourCard.png">
         </div>
-    </div>
-</section>
-<section id="aide">
-    <h1>Comment jouer ?</h1>
-    <div id="Text">
-    <p>Ce jeu est un tower defense, le but est construire des tours défensives, et arrêter des vagues d'ennemis en les eliminants.</p>
-    <p>Dans ce jeu, vous avez accès à 3 types de tours, les canons, qui sont de bon compromis entre la portée, l'attaque, et la vitesse d'attaque. Il y a ensuite les snipers, avec une portée couvrant toute la carte, des dégâts considérables, mais une vitesse d'attaque très lente. Et enfin, les Fours, émettant de la chaleur a courte portée, mais en infligeant des dégâts de zone.</p>
-    <p>Les vagues sont à appeler manuellement afin de laisser le temps de rajouter ou améliorer des tours, si toutefois, le jeu ne va pas assez vite, vous pouvez appeler une vague d'ennemis avant même que la précédente soit terminer, en bénéficiant d'un bonus d'argent.</p>
-    <p>Les ennemis sont de couleurs rouge a noir selon leur niveau, ce qui influe sur les dégâts de ces derniers.</p>
-    <p>Vous pouvez améliorer vos tours afin de leur donner de l'attaque, de la portée ou de la vitesse d'attaque supplémentaire.</p></div>
-    <div id="TowerCards">
-        <img src="./media/CanonCard.png" alt="CanonCard">
-        <img src="./media/SniperCard.png" alt="SnipersCard">
-        <img src="./media/FourCard.png" alt="FourCard.png">
-    </div>
-    <input id="helpbutton" type="button" value="Retourner au menu" onclick="RetourMenu()">
-</section>
+        <input id="helpbutton" type="button" value="Retourner au menu" onclick="RetourMenu()">
+    </section>
 </body>
 <script src="./js/towerdefense.js"></script>
+
 </html>
