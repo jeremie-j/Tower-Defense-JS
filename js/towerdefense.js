@@ -6,11 +6,9 @@ var UpDiv = document.querySelector("#Upgrades");
 var UpButtons = document.querySelectorAll("#Upgrades > input");
 var UpTitle = document.querySelector("#Upgrades > h1");
 var ResDiv = document.querySelector("#Resultats");
-var resTitle = document.querySelector("#Resultats>h1")
+var resTitle = document.querySelector("#Resultats>h1");
 var ctx = canvas.getContext("2d");
-var background;
-var Path;
-var map;
+//Recupération des images
 var Canon1 = document.querySelector("#Canon1");
 var Canon2 = document.querySelector("#Canon2");
 var Canon3 = document.querySelector("#Canon3");
@@ -23,12 +21,15 @@ var Four1 = document.querySelector("#Four1");
 var Four2 = document.querySelector("#Four2");
 var Four3 = document.querySelector("#Four3");
 
+//declaration Variables Globales
 var mousePosX;
 var mousePosY;
 var Buying;
 var TargetTimeout = 0;
 var canPlace = true;
-
+var background;
+var Path;
+var map;
 var selected;
 var TowerList;
 var PossiblesTargets;
@@ -40,16 +41,29 @@ var tower;
 var Ennemis;
 var Argent;
 var Interval;
+
+//Comment fonctionne le jeu ?
+//En premier le jeu crée une vague, la liste Ennemis est remplies de disctionnaire contenant le x, le y,le niveau, et l'avancement sur la carte. Pour les déplacements,
+//un chemin "path" indique les coordonnés absolues ou les ennemis doivent changer de direction, (ex: [450, 150, "Bas"], l'ennemis changera de direction vers le bas quand il sera en x450 et y150).
+//Chaque path a été au fait préalable selon la carte
+//La matrice/tableau "map" permet de connaitres les emplacements disponible pour y poser des tours, les 0 etant les espaces disponibles, et les 1, les espaces non disponibles. De base, les 1 existants sont les cases du chemin,
+//et des 1 se rajouteront au fur et mesure que le joueur rajoute des tours sur la carte.
+//La liste TowerList est remplis par des dictionnaires contennants les informations de chaques tours posées. Pour calculer la cible de la tour, la distance entre l'ennemis et la tour est calculée avec squrt((xa-xb)²-(ya-yb)²)
+//si la distance est inferieur a la portée de la tour, la cible est ajoutée a une liste "peut etre touchée par la tour". Pour l'attaque, les canon et les sniper infligent leurs degats au premier element de la liste
+//des cibles possibles, tandis que les fours infligent des dégats a toute cette liste pour simuler les dégats de zone. Les degats ne sont pas infligés en fonction de l'animation, il sont donc infligés apres un
+//delai de 250ms, pour essayer de synchronyser l'animation et les dégats.
+//Lorsque qu'une tour attaque, une animation est ajoutée a la liste "animation", a chaque tour de boucle du programme, une frame de chaque animation est dessiné. Lorsque l'animation est finie, elle est suprrimée de la liste.
 function DrawBackground() {
   ctx.drawImage(background, 0, 0);
 }
 
 function CreateWave() {
   Wave++;
-  if(Ennemis.length > 0 && Ennemis.length*2 > 50){
-    Argent += 50
-  }else if(Ennemis.length > 0){
-    Argent += Ennemis.length*2
+  if (Ennemis.length > 0 && Ennemis.length * 2 > 50) {
+    //Genere un bonus max de 50$ si une vague est appellé alors que la precedente n'est pas terminée
+    Argent += 50;
+  } else if (Ennemis.length > 0) {
+    Argent += Ennemis.length * 2;
   }
   for (let i = 0; i < Wave * 3; i++) {
     let GenEnnemis = {
@@ -61,7 +75,7 @@ function CreateWave() {
     };
     Ennemis.push(GenEnnemis);
   }
-  if(Wave%10==0 && Delay > 20){
+  if (Wave % 10 == 0 && Delay > 20) {
     Delay -= 20;
   }
 }
@@ -85,24 +99,26 @@ function EnnemisMove() {
     }
   }
 }
+
 function EnnemisDraw() {
   for (let i = 0; i < Ennemis.length; i++) {
+    if(Ennemis[i].x > -30){
     ctx.beginPath();
     ctx.arc(Ennemis[i].x, Ennemis[i].y, 30, 0, Math.PI * 2);
     if (Ennemis[i].lvl == 1) {
-      ctx.fillStyle = "red";
+      ctx.fillStyle = "#C44536";
     } else if (Ennemis[i].lvl == 2) {
-      ctx.fillStyle = "green";
+      ctx.fillStyle = "#90BE6D";
     } else if (Ennemis[i].lvl == 3) {
-      ctx.fillStyle = "grey";
+      ctx.fillStyle = "#F9C74F";
     } else if (Ennemis[i].lvl == 4) {
-      ctx.fillStyle = "black";
-    } else {
       ctx.fillStyle = "grey";
+    } else {
+      ctx.fillStyle = "black";
     }
     ctx.fill();
     ctx.closePath();
-  }
+  }}
 }
 function Buy(what) {
   if (what == "Canon") {
@@ -241,7 +257,7 @@ function DrawTower() {
     );
     ctx.rotate((-TowerList[i].angle * Math.PI) / 180);
     ctx.translate(-x - 50, -y - 50);
-    if(selected == i){
+    if (selected == i) {
       ctx.globalAlpha = 0.5;
       ctx.beginPath();
       ctx.fillStyle = "#7E7E7E";
@@ -261,7 +277,9 @@ function TowerAttack() {
   TowerFocus();
   for (let i = 0; i < TowerList.length; i++) {
     if (TowerList[i].canshot == true && TowerList[i].target.length > 0) {
+      //si la tour peut tirer et qu'il y a des ennemis a portée
       if (TowerList[i].tour == "Four") {
+        //si la tour est un four, toute les cibles a portées sont touchées
         for (let j = 0; j < TowerList[i].target.length; j++) {
           Ennemis[TowerList[i].target[j]].lvl -= TowerList[i].degats;
           let rayon = 0;
@@ -269,10 +287,11 @@ function TowerAttack() {
             name: "AnimationFour",
             x: TowerList[i].x,
             y: TowerList[i].y,
-            r: rayon
+            r: rayon,
           });
         }
       } else {
+        //si la tour n'est pas un four, seulement la premiere cible est touchée
         setTimeout(function () {
           Ennemis[TowerList[i].target[0]].lvl -= TowerList[i].degats;
         }, 250);
@@ -294,6 +313,7 @@ function TowerAttack() {
 }
 function TowerFocus() {
   if (TargetTimeout == 5) {
+    //verifie la distance seulement 1 fois par tour de boucle pour eviter de trop charger en calculs
     TargetTimeout = 0;
     calculDistance();
   } else {
@@ -316,8 +336,10 @@ function calculDistance() {
     }
     if (PossiblesTargets.length != 0) {
       if (TowerList[i].tour == "Four") {
+        //si la tour est un four, tous les ennemis a portée sont des cibles
         TowerList[i].target = PossiblesTargets;
       } else {
+        //si la tour n'est pas un four, juste le premier ennemis a portée est la cible
         TowerList[i].target = [PossiblesTargets[0]];
       }
     } else {
@@ -328,7 +350,8 @@ function calculDistance() {
 }
 
 function calculAngle(nb) {
-  if (TowerList[nb].target.length > 0) {
+  //calcul l'angle pour l'orientation de la tour
+  if (TowerList[nb].target.length > 0 && Ennemis.length > 0) {
     TowerList[nb].angle = Math.round(
       (Math.atan2(
         Ennemis[TowerList[nb].target[0]].y - TowerList[nb].y,
@@ -373,70 +396,85 @@ function DrawAnimation() {
     }
   }
 }
-function Upgrades(){
-  if(selected == null){
-  BuyDiv.style.display ="flex";
-  UpDiv.style.display = "none";
-  }else{
-    BuyDiv.style.display ="none";
+function Upgrades() {
+  if (selected == null) {
+    BuyDiv.style.display = "flex";
+    UpDiv.style.display = "none";
+  } else {
+    BuyDiv.style.display = "none";
     UpDiv.style.display = "flex";
-    UpTitle.innerHTML = "Tour : "+ TowerList[selected].tour + " "+TowerList[selected].lvl+ " | Argent: "+Argent
-    for(let i = 0; i<UpButtons.length - 2;i++){
-      if(TowerList[selected].tour == "Canon"){
+    UpTitle.innerHTML =
+      "Tour : " +
+      TowerList[selected].tour +
+      " " +
+      TowerList[selected].lvl +
+      " | Argent: " +
+      Argent;
+    for (let i = 0; i < UpButtons.length - 2; i++) {
+      if (TowerList[selected].tour == "Canon") {
         UpButtons[i].style.backgroundColor = "#C44536";
-      }else if(TowerList[selected].tour == "Sniper"){
+      } else if (TowerList[selected].tour == "Sniper") {
         UpButtons[i].style.backgroundColor = "#90BE6D";
-      }else if(TowerList[selected].tour == "Four"){
+      } else if (TowerList[selected].tour == "Four") {
         UpButtons[i].style.backgroundColor = "#F9C74F";
       }
     }
   }
 }
-function Up(what){
-  if(what =="range" && Argent >= 400){
+function Up(what) {
+  if (what == "range" && Argent >= 400) {
     Argent -= 400;
     TowerList[selected].range += 50;
-    if(TowerList[selected].lvl<3){
-      TowerList[selected].lvl++
+    if (TowerList[selected].lvl < 3) {
+      TowerList[selected].lvl++;
     }
-  }else if(what == "damage" && Argent >= 500){
+  } else if (what == "damage" && Argent >= 500) {
     Argent -= 500;
     TowerList[selected].degats += 2;
-    if(TowerList[selected].lvl<3){
-      TowerList[selected].lvl++
+    if (TowerList[selected].lvl < 3) {
+      TowerList[selected].lvl++;
     }
-  }else if(what == "speed" && Argent >= 250 && TowerList[selected].vitesse_attaque > 500){
+  } else if (
+    what == "speed" &&
+    Argent >= 250 &&
+    TowerList[selected].vitesse_attaque > 500
+  ) {
     Argent -= 250;
     TowerList[selected].vitesse_attaque -= 100;
-    if(TowerList[selected].lvl<3){
-      TowerList[selected].lvl++
+    if (TowerList[selected].lvl < 3) {
+      TowerList[selected].lvl++;
     }
-}}
-function Title(){
-  BuyTitle.innerHTML = "Vague: "+ Wave+ " | Vie: "+ vie + " | Argent: "+Argent;
-  if(Ennemis.length > 0 && Ennemis.length*2>50){
+  }
+}
+function Title() {
+  BuyTitle.innerHTML =
+    "Vague: " + Wave + " | Vie: " + vie + " | Argent: " + Argent;
+  //Genere un bonus max de 50$ si une vague est appellé alors que la precedente n'est pas terminée
+  if (Ennemis.length > 0 && Ennemis.length * 2 > 50) {
     UpButtons[4].value = "Passer a la vague suivante (Bonus : 50$)";
     BuyButtons[4].value = "Passer a la vague suivante (Bonus : 50$)";
-  }else if(Ennemis.length > 0){
-    UpButtons[4].value = "Passer a la vague suivante (Bonus : "+Ennemis.length*2+"$)";
-    BuyButtons[4].value = "Passer a la vague suivante (Bonus : "+Ennemis.length*2+"$)";
-  }else{
+  } else if (Ennemis.length > 0) {
+    UpButtons[4].value =
+      "Passer a la vague suivante (Bonus : " + Ennemis.length * 2 + "$)";
+    BuyButtons[4].value =
+      "Passer a la vague suivante (Bonus : " + Ennemis.length * 2 + "$)";
+  } else {
     UpButtons[4].value = "Passer a la vague suivante";
     BuyButtons[4].value = "Passer a la vague suivante";
   }
 }
-function Mort(){
-  if(vie <= 0){
-    BuyDiv.style.display="none"
-    UpDiv.style.display="none"
-    ResDiv.style.display="flex"
-    resTitle.innerHTML = "Vous avez perdu a la vague "+ Wave;
+function Mort() {
+  if (vie <= 0) {
+    BuyDiv.style.display = "none";
+    UpDiv.style.display = "none";
+    ResDiv.style.display = "flex";
+    resTitle.innerHTML = "Vous avez perdu a la vague " + Wave;
     clearInterval(Interval);
   }
 }
 function Draw() {
-  Upgrades()
-  Title()
+  Upgrades();
+  Title();
   DrawBackground();
   EnnemisMove();
   EnnemisDraw();
@@ -444,7 +482,7 @@ function Draw() {
   TowerAttack();
   DrawAnimation();
   DrawTower();
-  Mort()
+  Mort();
   if (tower != null) {
     BuyingTower();
   }
@@ -455,24 +493,24 @@ function RandomInt(max) {
 }
 function FindTower() {
   for (let i = 0; i < TowerList.length; i++) {
-    if(
+    if (
       TowerList[i].x == Math.round(mousePosX / 100) * 100 + 50 &&
       TowerList[i].y == Math.round(mousePosY / 100) * 100 + 50
-    ){
+    ) {
       selected = i;
-      break
-    }else{
+      break;
+    } else {
       selected = null;
     }
   }
 }
-function RetourMenu(){
-  document.querySelector("#menu").style.display="flex";
-  document.querySelector("#aide").style.display="none";
-  ResDiv.style.display="none";
-  document.querySelector("#jeu").style.display="none";
+function RetourMenu() {
+  document.querySelector("#menu").style.display = "flex";
+  document.querySelector("#aide").style.display = "none";
+  ResDiv.style.display = "none";
+  document.querySelector("#jeu").style.display = "none";
 }
-function Unselect(){
+function Unselect() {
   selected = null;
 }
 canvas.addEventListener("mousemove", function () {
@@ -488,8 +526,8 @@ canvas.addEventListener("click", function () {
     FindTower();
   }
 });
-function play(i){
-  if(i == 1){
+function play(i) {
+  if (i == 1) {
     background = document.querySelector("#carte1");
     Path = [
       [0, 150, "Droite"],
@@ -510,18 +548,18 @@ function play(i){
       [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     ];
-  }else if(i==2){
+  } else if (i == 2) {
     background = document.querySelector("#carte2");
     Path = [
       [0, 150, "Droite"],
       [150, 150, "Bas"],
-      [150,650, "Droite"],
-      [450,650, "Haut"],
-      [450,550, "Droite"],
-      [650,550, "Bas"],
-      [650,650,"Droite"],
-      [950,650, "Haut"],
-      [950, -100, "Haut"]
+      [150, 650, "Droite"],
+      [450, 650, "Haut"],
+      [450, 550, "Droite"],
+      [650, 550, "Bas"],
+      [650, 650, "Droite"],
+      [950, 650, "Haut"],
+      [950, -100, "Haut"],
     ];
     map = [
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
@@ -533,20 +571,20 @@ function play(i){
       [0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     ];
-  }else if(i==3){
+  } else if (i == 3) {
     background = document.querySelector("#carte3");
     Path = [
       [0, 150, "Droite"],
       [50, 150, "Bas"],
-      [50,750, "Droite"],
-      [950,750, "Haut"],
-      [950,550, "Gauche"],
-      [750,550, "Haut"],
-      [750,350,"Droite"],
-      [850,350, "Haut"],
-      [850,250,"Droite"],
-      [950,250, "Haut"],
-      [950, -100, "Haut"]
+      [50, 750, "Droite"],
+      [950, 750, "Haut"],
+      [950, 550, "Gauche"],
+      [750, 550, "Haut"],
+      [750, 350, "Droite"],
+      [850, 350, "Haut"],
+      [850, 250, "Droite"],
+      [950, 250, "Haut"],
+      [950, -100, "Haut"],
     ];
     map = [
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
@@ -558,16 +596,16 @@ function play(i){
       [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
     ];
-  }else if(i==4){
+  } else if (i == 4) {
     background = document.querySelector("#carte4");
     Path = [
       [0, 150, "Droite"],
-      [350,150, "Bas"],
-      [350,250, "Droite"],
-      [550,250, "Bas"],
-      [550,350, "Droite"],
-      [950,350, "Haut"],
-      [950, -100, "Haut"]
+      [350, 150, "Bas"],
+      [350, 250, "Droite"],
+      [550, 250, "Bas"],
+      [550, 350, "Droite"],
+      [950, 350, "Haut"],
+      [950, -100, "Haut"],
     ];
     map = [
       [1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1],
@@ -588,12 +626,12 @@ function play(i){
   Delay = 80;
   Ennemis = [];
   Argent = 500;
-  document.querySelector("#menu").style.display="none";
-  ResDiv.style.display="none";
-  document.querySelector("#jeu").style.display="flex";
+  document.querySelector("#menu").style.display = "none";
+  ResDiv.style.display = "none";
+  document.querySelector("#jeu").style.display = "flex";
   Interval = setInterval(Draw, 25); //25
 }
-function aide(){
-  document.querySelector("#menu").style.display="none";
-  document.querySelector("#aide").style.display="flex";
+function aide() {
+  document.querySelector("#menu").style.display = "none";
+  document.querySelector("#aide").style.display = "flex";
 }
