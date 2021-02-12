@@ -397,7 +397,7 @@ function Up(what){
     if(TowerList[selected].lvl<3){
       TowerList[selected].lvl++
     }
-  }else if(what == "damage" && Argent >= 500 && TowerList[selected].tour!="Four"){
+  }else if(what == "damage" && Argent >= 500){
     Argent -= 500;
     TowerList[selected].degats += 2;
     if(TowerList[selected].lvl<3){
