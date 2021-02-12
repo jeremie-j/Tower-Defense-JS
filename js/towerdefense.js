@@ -46,7 +46,9 @@ function DrawBackground() {
 
 function CreateWave() {
   Wave++;
-  if(Ennemis.length > 0){
+  if(Ennemis.length > 0 && Ennemis.length*2 > 50){
+    Argent += 50
+  }else if(Ennemis.length > 0){
     Argent += Ennemis.length*2
   }
   for (let i = 0; i < Wave * 3; i++) {
