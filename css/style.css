@@ -1,0 +1,105 @@
+*{
+    margin:0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    display: flex;
+    justify-content: center;
+    font-family: "poppins";
+}
+#jeu{
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+#menu{
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+#MenuContent{
+    display: flex;
+    flex-direction: column;
+}#MenuContent>h1{
+    font-size: 30px;
+    margin: 20px;
+}
+#aide{
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
+    padding: 90px;
+}
+#Text{
+    width: 80%;
+}#Text>p{
+    font-size: 26px;
+    letter-spacing: -1px;
+    padding-top: 10px;
+}
+#Buy,#Upgrades,#Resultats{
+    height: 800px;
+    margin-left: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#cartes{
+    width: 1200px;
+    display: flex;
+    flex-wrap: wrap;
+}
+canvas{
+    border-radius: 10px;
+}
+input{
+    font-size: 20px;
+    border: none;
+    border-radius: 5px;
+    height: 50px;
+    width: 500px;
+}
+.Canon{
+    background-color: #C44536;
+}
+.Sniper{
+    background-color: #90BE6D;
+}
+.Four{
+    background-color: #F9C74F;
+}
+.imgCarte{
+    border-radius: 10px;
+    height: 300px;
+}
+#TowerCards>img{
+    transform: translateY(0px);
+    transition-duration: 0.5s;
+}#TowerCards>img:hover{
+    transform: translateY(10px);
+    transition-duration: 0.5s;
+}
+#cartes>div{
+    margin:20px;
+    cursor:pointer;
+    transform: translateY(0px);
+    transition-duration: 0.5s;
+}
+#cartes>div:hover{
+    transform: translateY(10px);
+    transition-duration: 0.5s;
+}
+#helpbutton{
+    margin: 20px;
+}
