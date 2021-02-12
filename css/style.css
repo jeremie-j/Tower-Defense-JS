@@ -6,7 +6,13 @@
 body{
     display: flex;
     justify-content: center;
-    font-family: "poppins";
+    font-family: "Poppins", sans-serif;
+}
+h1{
+    font-family: "Poppins", sans-serif;
+}
+h2{
+    font-family: "Poppins", sans-serif;
 }
 #jeu{
     width: 100vw;
